@@ -14,8 +14,8 @@ public class SwiftDataDomePlugin: NSObject, FlutterPlugin {
     let args = call.arguments as! [String: Any]
     let url = args["url"] as! String
     let headers = args["headers"] as? [String: String]
-    let body = args["body"] as? Data
-    httpCall(method, url, headers, body, result)
+    let body = args["body"] as? FlutterStandardTypedData
+    httpCall(method, url, headers, body?.data, result)
   }
   
   private func httpCall(_ method: String, _ url: String, _ headers: [String: String]?, _ body: Data?,_ result: @escaping FlutterResult) {

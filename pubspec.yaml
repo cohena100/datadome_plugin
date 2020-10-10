@@ -1,6 +1,6 @@
 name: data_dome_plugin
 description: Plugin for DataDome.
-version: 0.0.3
+version: 0.0.5
 homepage: https://github.com/cohena100/datadome_plugin
 
 environment:
