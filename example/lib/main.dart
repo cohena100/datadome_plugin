@@ -35,20 +35,25 @@ class _MyAppState extends State<MyApp> {
     String platformVersion;
     // Platform messages may fail, so we use a try/catch PlatformException.
     try {
-      platformVersion = await DataDomePlugin.platformVersion;
-    } on PlatformException {
-      platformVersion = 'Failed to get platform version.';
-    }
-    try {
       final headers = {
         'Content-type': 'application/json',
         'Accept': 'application/json',
       };
-      final key = 'DataDome key';
-      final url = 'some url';
-      final response = await DataDomePlugin.getCall(url, headers, key);
+      //TODO: fill in url, DataDome key for android
+      final key = '';
+      final url = '';
+      final body = null;
+      final response = await DataDomePlugin.httpCall(
+        HttpMethod.get,
+        url,
+        headers,
+        body,
+        key,
+      );
+      final int responseCode = response['code'];
+      platformVersion = responseCode.toString();
     } on PlatformException {
-      platformVersion = 'Failed to get GET.';
+      platformVersion = 'Failed HTTP call';
     }
 
     // If the widget was removed from the tree while the asynchronous platform

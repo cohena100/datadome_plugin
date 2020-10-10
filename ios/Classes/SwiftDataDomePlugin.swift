@@ -10,24 +10,24 @@ public class SwiftDataDomePlugin: NSObject, FlutterPlugin {
   }
   
   public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-    switch call.method {	
-    case "getPlatformVersion":
-      result("iOS " + UIDevice.current.systemVersion)
-    case "get":
-      let args = call.arguments as! [String: Any]
-      let url = args["url"] as! String
-      let headers = args["headers"] as! [String: String]
-      get(url, headers, result)
-    default:
-      result(nil)
-    }
+    let method =  call.method.uppercased()
+    let args = call.arguments as! [String: Any]
+    let url = args["url"] as! String
+    let headers = args["headers"] as? [String: String]
+    let body = args["body"] as? Data
+    httpCall(method, url, headers, body, result)
   }
   
-  private func get(_ url: String, _ headers: [String: String], _ result: @escaping FlutterResult) {
-    guard let theUrl = URL(string: url) else {
-      return
+  private func httpCall(_ method: String, _ url: String, _ headers: [String: String]?, _ body: Data?,_ result: @escaping FlutterResult) {
+    var request = URLRequest(url: URL(string: url)!)
+    request.httpMethod = method
+    if let headers = headers {
+      for (field, value) in headers{
+        request.addValue(value, forHTTPHeaderField: field)
+      }
     }
-    let task = URLSession.shared.protectedDataTask(withURL: theUrl, captchaDelegate: nil) { (data, response, error) in
+    request.httpBody = body
+    let task = URLSession.shared.protectedDataTask(withRequest: request, captchaDelegate: nil) { (data, response, error) in
       DispatchQueue.main.async {
         if let response = response as? HTTPURLResponse {
           let statusCode = NSNumber(value: response.statusCode)
@@ -38,7 +38,7 @@ public class SwiftDataDomePlugin: NSObject, FlutterPlugin {
             result(["code": statusCode])
           }
         } else {
-          result([:] as! [String: Any])
+          result([String: Any]())
         }
       }
     }
