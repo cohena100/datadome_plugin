@@ -33,21 +33,15 @@ class DataDomePlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     }
 
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
-        when (call.method) {
-            "getPlatformVersion" -> result.success("Android ${android.os.Build.VERSION.RELEASE}")
-            "get" -> {
-                @Suppress("UNCHECKED_CAST")
-                val args = call.arguments as Map<String, Any>
-                val url = args["url"] as String
-                @Suppress("UNCHECKED_CAST")
-                val headers = args["headers"] as Map<String, String>
-                val key = args["key"] as String
-                get(url, headers, key, result)
-            }
-            else -> { // Note the block
-                result.notImplemented()
-            }
-        }
+        @Suppress("UNCHECKED_CAST")
+        val args = call.arguments as Map<String, Any>
+        val url = args["url"] as String
+
+        @Suppress("UNCHECKED_CAST")
+        val headers = args["headers"] as? Map<String, String>
+        val body = args["body"] as? ByteArray
+        val key = args["key"] as String
+        httpCall(call.method, url, headers, body, key, result)
     }
 
     override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
@@ -70,15 +64,43 @@ class DataDomePlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         activity = binding.activity
     }
 
-    fun get(url: String, headers: Map<String, String>, key: String, result: Result) {
-        dataDomeSDK = DataDomeSDK.with(activity?.application, key, BuildConfig.VERSION_NAME).agent("BLOCKUA")
-        dataDomeSDK.userAgent = "BLOCKUA"
+    private fun httpCall(method: String, url: String, headers: Map<String, String>?, body: ByteArray?, key: String, result: Result) {
+        dataDomeSDK = DataDomeSDK.with(activity!!.application, key, BuildConfig.VERSION_NAME)
         val builder = OkHttpClient.Builder()
         builder.addInterceptor(DataDomeInterceptor(activity!!.application, dataDomeSDK))
         val client = builder.build()
-        val headersBuild: Headers = Headers.of(headers)
-        val request = Request.Builder().url(url).headers(headersBuild).build()
-        client.newCall(request).enqueue(object : Callback {
+        var requestBuilder = Request.Builder().url(url)
+        if (headers != null) {
+            requestBuilder = requestBuilder.headers(Headers.of(headers))
+        }
+        when (method) {
+            "get" -> {
+                requestBuilder = requestBuilder.get()
+            }
+            "delete" -> {
+                requestBuilder = requestBuilder.delete()
+            }
+            "post" -> {
+                requestBuilder = if (body != null) {
+                    requestBuilder.post(RequestBody.create(null, body))
+                } else {
+                    requestBuilder.post(RequestBody.create(null, ByteArray(0)))
+                }
+            }
+            "put" -> {
+                requestBuilder = if (body != null) {
+                    requestBuilder.put(RequestBody.create(null, body))
+                } else {
+                    requestBuilder.put(RequestBody.create(null, ByteArray(0)))
+                }
+            }
+            else -> { // Note the block
+                result.notImplemented()
+                return
+            }
+        }
+
+        client.newCall(requestBuilder.build()).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 Handler(Looper.getMainLooper()).post {
                     result.success(emptyMap<String, Any>())
