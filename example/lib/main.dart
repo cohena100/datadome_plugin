@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:data_dome_plugin/data_dome_plugin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
 
 void main() {
   runApp(MyApp());
@@ -43,15 +45,15 @@ class _MyAppState extends State<MyApp> {
       final key = '';
       final url = '';
       final body = null;
-      final response = await DataDomePlugin.httpCall(
+      final result = await DataDomePlugin.httpCall(
         HttpMethod.get,
         url,
         headers,
         body,
         key,
       );
-      final int responseCode = response['code'];
-      platformVersion = responseCode.toString();
+      final response = _makeResponse(result);
+      platformVersion = response.statusCode.toString();
     } on PlatformException {
       platformVersion = 'Failed HTTP call';
     }
@@ -70,5 +72,15 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     initPlatformState();
+  }
+
+  http.Response _makeResponse(Map<String, dynamic> resp) {
+    final int code = resp['code'] ?? 500;
+    final Uint8List data = resp['data'] ?? Uint8List(0);
+    return http.Response.bytes(
+      data.toList(),
+      code,
+      headers: {'content-type': 'application/json; charset=utf-8'},
+    );
   }
 }
