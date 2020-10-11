@@ -17,3 +17,8 @@
 ## 0.0.5
 
 * Bug: empty body
+
+## 0.0.6
+
+* Added HTTP calls for android
+
