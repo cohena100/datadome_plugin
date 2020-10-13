@@ -22,3 +22,15 @@
 
 * Added HTTP calls for android
 
+## 1.0.0
+
+* Supporting GET, DELETE, POST and PUT.
+
+## 1.0.1
+
+* Updated README.md
+
+## 1.0.2
+
+* Updated README.md for adding swift/kotlin support to existing project.
+

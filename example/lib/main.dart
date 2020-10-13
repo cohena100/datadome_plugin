@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:data_dome_plugin/data_dome_plugin.dart';
@@ -47,6 +48,33 @@ class _MyAppState extends State<MyApp> {
       final body = null;
       final result = await DataDomePlugin.httpCall(
         HttpMethod.get,
+        url,
+        headers,
+        body,
+        key,
+      );
+      final response = _makeResponse(result);
+      platformVersion = response.statusCode.toString();
+    } on PlatformException {
+      platformVersion = 'Failed HTTP call';
+    }
+
+    try {
+      final headers = {
+        'Content-type': 'application/json',
+        'Accept': 'application/json',
+      };
+      //TODO: fill in url, DataDome key for android
+      final key = '';
+      final url = '';
+      final json = {
+        "any": "body",
+        "some": 1,
+        "is": true,
+      };
+      final body = Uint8List.fromList(utf8.encode(jsonEncode(json)));
+      final result = await DataDomePlugin.httpCall(
+        HttpMethod.post,
         url,
         headers,
         body,
