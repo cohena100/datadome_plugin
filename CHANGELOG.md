@@ -34,3 +34,6 @@
 
 * Updated README.md for adding swift/kotlin support to existing project.
 
+## 1.0.3
+
+* Null safety

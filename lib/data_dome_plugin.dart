@@ -15,10 +15,10 @@ class DataDomePlugin {
     String key,
   ) async {
     final args = {'url': url, 'headers': headers, 'body': body, 'key': key};
-    final Map<String, dynamic> response = await _channel.invokeMapMethod(
+    final Map<String, dynamic> response = await (_channel.invokeMapMethod(
       describeEnum(method),
       args,
-    );
+    ) as FutureOr<Map<String, dynamic>>);
     return response;
   }
 }
