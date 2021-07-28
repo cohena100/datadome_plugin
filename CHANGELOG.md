@@ -49,3 +49,7 @@
 ## 1.0.6
 
 * bug fix
+
+## 1.0.7
+
+* bug in android
