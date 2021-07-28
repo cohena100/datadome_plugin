@@ -15,7 +15,7 @@ class DataDomePlugin {
     String key,
   ) async {
     final args = {'url': url, 'headers': headers, 'body': body, 'key': key};
-    final Map<String, dynamic> response = await (_channel.invokeMapMethod(
+    final Map<String, dynamic> response = await (_channel.invokeMapMethod<String, dynamic>(
       describeEnum(method),
       args,
     ) as Future<Map<String, dynamic>>);
