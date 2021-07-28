@@ -37,3 +37,7 @@
 ## 1.0.3
 
 * Null safety
+
+## 1.0.4
+
+* bug fix

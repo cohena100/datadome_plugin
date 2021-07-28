@@ -18,7 +18,7 @@ class DataDomePlugin {
     final Map<String, dynamic> response = await (_channel.invokeMapMethod(
       describeEnum(method),
       args,
-    ) as FutureOr<Map<String, dynamic>>);
+    ) as Future<Map<String, dynamic>>);
     return response;
   }
 }
