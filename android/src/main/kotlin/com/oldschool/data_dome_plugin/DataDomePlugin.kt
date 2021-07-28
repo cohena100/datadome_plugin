@@ -65,7 +65,8 @@ class DataDomePlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     }
 
     private fun httpCall(method: String, url: String, headers: Map<String, String>?, body: ByteArray?, key: String, result: Result) {
-        dataDomeSDK = DataDomeSDK.with(activity!!.application, key, BuildConfig.VERSION_NAME)
+        val versionName = activity!!.packageManager.getPackageInfo(activity!!.packageName, 0).versionName
+        dataDomeSDK = DataDomeSDK.with(activity!!.application, key, versionName)
         val builder = OkHttpClient.Builder()
         builder.addInterceptor(DataDomeInterceptor(activity!!.application, dataDomeSDK))
         val client = builder.build()
